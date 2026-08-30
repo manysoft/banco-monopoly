@@ -87,3 +87,27 @@ function realizarPago() {
         alert("Hubo un error al procesar la transferencia");
     });
 }
+function crearJugador() {
+    const nombre = document.getElementById("new-name").value.trim();
+    if (!nombre) return alert("Por favor ingresa un nombre");
+
+    const payload = {
+        action: "agregarJugador",
+        nombre: nombre,
+        saldoInicial: 1500 // Cambia esto si en tu regla de Monopoly empiezan con otro monto
+    };
+
+    fetch(API_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+    }).then(() => {
+        alert("¡Jugador registrado con éxito!");
+        document.getElementById("new-name").value = "";
+        setTimeout(cargarDatos, 2000); // Recarga la lista tras 2 segundos
+    }).catch(error => {
+        console.error("Error:", error);
+        alert("Hubo un error al registrar el jugador");
+    });
+}
