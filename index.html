@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banco Monopoly</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🏦 Banco Monopoly</h1>
+        
+        <div id="user-selection" class="card">
+            <h3>Selecciona tu usuario</h3>
+            <select id="player-select">
+                <option value="">Cargando jugadores...</option>
+            </select>
+            <button onclick="seleccionarJugador()">Entrar</button>
+        </div>
+
+        <div id="dashboard" class="card hidden">
+            <h2 id="welcome-user">Hola</h2>
+            <div class="balance-box">
+                <p>Tu Saldo Actual:</p>
+                <h3 id="user-balance">$0</h3>
+            </div>
+
+            <div class="transfer-section">
+                <h3>Realizar Pago / Transferencia</h3>
+                <label>Pagar a:</label>
+                <select id="target-select">
+                    </select>
+                <label>Monto ($):</label>
+                <input type="number" id="amount-input" placeholder="Ej. 500">
+                <label>Concepto:</label>
+                <input type="text" id="concept-input" placeholder="Ej. Racha de alquiler">
+                <button class="btn-pay" onclick="realizarPago()">Enviar Dinero</button>
+            </div>
+            
+            <button class="btn-refresh" onclick="cargarDatos()">Actualizar Datos</button>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
