@@ -111,3 +111,28 @@ function crearJugador() {
         alert("Hubo un error al registrar el jugador");
     });
 }
+function cobrarGo() {
+    if (!jugadorActual) return;
+
+    const monto = 200; // Puedes cambiar la cantidad si tus reglas son diferentes
+    const payload = {
+        action: "transferir",
+        deId: "banco",             // El dinero sale del Banco
+        paraId: jugadorActual.id,  // Entra al bolsillo del jugador actual
+        monto: monto,
+        concepto: "Cobro por pasar por GO"
+    };
+
+    fetch(API_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+    }).then(() => {
+        alert("¡Has cobrado $200 por pasar por GO!");
+        setTimeout(cargarDatos, 2000); // Espera 2 segundos para refrescar el saldo
+    }).catch(error => {
+        console.error("Error:", error);
+        alert("Hubo un error al cobrar GO");
+    });
+}
