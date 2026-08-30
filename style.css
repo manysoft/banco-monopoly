@@ -73,3 +73,12 @@ button:hover {
     background-color: #3498db;
     margin-top: 10px;
 }
+
+.btn-go {
+    background-color: #f39c12;
+    margin-bottom: 20px;
+}
+
+.btn-go:hover {
+    background-color: #d68910;
+}
