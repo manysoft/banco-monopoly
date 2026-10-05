@@ -1,56 +1,308 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Banco Monopoly</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Banco Monopoly</title>
+<style>
+  :root{--rojo:#ad1f18;--verde:#1b672d;--naranja:#df6a00;--azul:#00449a;--crema:#f8f8d0}
+  *{box-sizing:border-box;font-family:Calibri,Arial,sans-serif}
+  body{margin:0;background:#e6e6e6;min-height:100vh}
+  .vista{display:none;width:100%;max-width:480px;margin:0 auto;min-height:100vh;min-height:100dvh}
+  .vista.activa{display:flex;flex-direction:column}
+  #vReg.activa{justify-content:center;align-items:center;padding:20px;gap:40px}
+  #vPanel.activa{background:var(--crema);box-shadow:0 0 20px #0002}
+  h1.logo{color:var(--rojo);text-align:center;margin:0;font-size:34px}
+  .card{background:#fff;border-radius:26px;overflow:hidden;box-shadow:0 4px 14px #0003;margin:0;width:100%;max-width:420px}
+  .card h2{background:var(--rojo);color:#fff;margin:0;padding:22px;text-align:center;font-size:30px}
+  .card .cuerpo{padding:20px 26px 28px;text-align:center}
+  .card label{display:block;text-align:left;font-size:22px;margin-bottom:6px}
+  input,select{width:100%;padding:14px;font-size:20px;border:1px solid #aaa;border-radius:12px;background:#fff}
+  button{border:0;color:#fff;font-weight:bold;font-size:22px;border-radius:14px;padding:14px;cursor:pointer;text-transform:uppercase}
+  .card button{background:var(--verde);margin-top:18px;padding:14px 28px}
+  header{flex:none;background:var(--rojo);color:#fff;display:flex;justify-content:center;align-items:center;position:relative;height:86px}
+  header h2{margin:0;font-size:32px}
+  #btnSalir{position:absolute;right:16px;top:24px;background:var(--verde);font-size:18px;padding:6px 22px;border-radius:10px}
+  .panel{flex:1;display:flex;flex-direction:column;justify-content:center;padding:16px 20px}
+  .panel h1{text-align:center;margin:6px 0 14px;font-size:44px}
+  .saldo{background:var(--verde);color:#fff;border-radius:16px;text-align:center;padding:14px}
+  .saldo small{font-size:22px;font-weight:bold;text-transform:uppercase}
+  .saldo div{font-size:62px;font-weight:bold}
+  .btn-block{width:100%;margin-top:18px}
+  .rojo{background:var(--rojo)}.naranja{background:var(--naranja)}.azul{background:var(--azul)}.verde{background:var(--verde)}
+  .panel label{display:block;text-align:center;font-size:24px;margin:14px 0 6px}
+  .modal{display:none;position:fixed;inset:0;background:#0007;align-items:center;justify-content:center;padding:20px;z-index:10}
+  .modal.activa{display:flex}
+  .modal .caja{background:#fff;border-radius:18px;padding:20px;width:100%;max-width:440px;max-height:85vh;overflow:auto}
+  .modal h3{margin:0 0 12px;font-size:26px;text-align:center}
+  .mov{display:flex;justify-content:space-between;padding:10px 4px;border-bottom:1px solid #ddd;font-size:19px}
+  .ingreso{color:var(--verde)}.egreso{color:var(--rojo)}
+  .fila-btn{display:flex;gap:10px;margin-top:14px}.fila-btn button{flex:1;font-size:18px}
+  #toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:10px 20px;border-radius:20px;display:none;z-index:20}
+
+  /* Panel ajustado a la pantalla */
+  #vPanel.activa{height:100vh;height:100dvh;min-height:0;overflow:hidden}
+  #vPanel header{height:clamp(52px,9vh,86px)}
+  #vPanel header h2{font-size:clamp(22px,4vh,32px)}
+  #vPanel #btnSalir{top:50%;transform:translateY(-50%);font-size:clamp(14px,2.4vh,18px);padding:6px 18px}
+  #vPanel .panel{min-height:0;gap:clamp(6px,1.6vh,16px);padding:clamp(8px,2vh,16px) 20px}
+  #vPanel .panel h1{margin:0;font-size:clamp(26px,5.5vh,44px)}
+  #vPanel .saldo{padding:clamp(6px,1.4vh,14px)}
+  #vPanel .saldo small{font-size:clamp(16px,2.6vh,22px)}
+  #vPanel .saldo div{font-size:clamp(38px,8vh,62px);line-height:1.1}
+  #vPanel .panel label{margin:0;font-size:clamp(16px,2.8vh,24px)}
+  #vPanel .btn-block{margin-top:0}
+  #vPanel .panel button{padding:clamp(8px,1.8vh,14px);font-size:clamp(16px,2.8vh,22px)}
+  #vPanel .panel input,#vPanel .panel select{padding:clamp(8px,1.6vh,14px);font-size:clamp(16px,2.6vh,20px)}
+
+  /* Pago exitoso */
+  #vOk.activa{background:var(--crema);justify-content:center;align-items:center;padding:20px;height:100vh;height:100dvh;box-shadow:0 0 20px #0002}
+  .okcard{background:#fff;border-radius:26px;box-shadow:0 4px 14px #0003;width:100%;max-width:420px;overflow:hidden}
+  .okcuerpo{text-align:center;padding:clamp(16px,4vh,36px) 20px;color:var(--verde)}
+  .okicon{width:clamp(60px,12vh,96px);height:clamp(60px,12vh,96px)}
+  .oktit{font-size:clamp(18px,3vh,24px);font-weight:bold;margin-top:clamp(10px,2.5vh,24px)}
+  .oknom{font-size:clamp(32px,6vh,48px);font-weight:bold;text-transform:uppercase;margin-top:6px;word-break:break-word}
+  .okmonto{font-size:clamp(44px,9vh,72px);font-weight:bold;color:#000;line-height:1.1}
+  .okpie{border-top:1px solid #ccc;padding:clamp(12px,3vh,22px) 22px}
+  .okpie button{width:100%;padding:clamp(10px,2vh,16px);font-size:clamp(18px,3vh,24px)}
+
+  /* Pantalla de carga */
+  #loader{display:none;position:fixed;inset:0;z-index:50;background:var(--crema);flex-direction:column;align-items:center;justify-content:center;gap:18px}
+  #loader.activa{display:flex}
+  .spin{width:64px;height:64px;border:7px solid #ddd;border-top-color:var(--verde);border-radius:50%;animation:giro .8s linear infinite}
+  .lt{font-size:24px;font-weight:bold;color:var(--verde)}
+  @keyframes giro{to{transform:rotate(360deg)}}
+
+  /* Vista banco */
+  #vBanco.activa{background:#fff;height:100vh;height:100dvh;min-height:0;overflow:hidden;box-shadow:0 0 20px #0002}
+  #vBanco header{flex:none;height:clamp(52px,9vh,86px)}
+  #vBanco header h2{font-size:clamp(22px,4vh,32px)}
+  .bcuerpo{flex:1;min-height:0;display:flex;flex-direction:column;gap:clamp(8px,1.8vh,16px);padding:clamp(14px,4vh,40px) 24px 0}
+  .bcuerpo label{text-align:center;font-size:clamp(18px,3vh,26px);margin:0}
+  .bcuerpo button,.bpie button{width:100%;padding:clamp(10px,2vh,16px);font-size:clamp(17px,2.9vh,24px)}
+  .bcuerpo input,.bcuerpo select{padding:clamp(9px,1.8vh,14px);font-size:clamp(16px,2.6vh,20px)}
+  .bcuerpo button{margin-top:clamp(2px,1vh,8px)}
+  .bpie{flex:none;border-top:1px solid #ccc;padding:clamp(10px,2.5vh,20px) 24px}
+  #vOkBanco.activa{justify-content:center;align-items:center;padding:20px;height:100vh;height:100dvh;min-height:0}
+  #vOkBanco .okcuerpo{color:var(--rojo)}
+</style>
 </head>
 <body>
-    <div class="container">
-        <h1>🏦 Banco Monopoly</h1>
-        
-        <div id="user-selection" class="card">
-            <h3>Selecciona tu usuario</h3>
-            <select id="player-select">
-                <option value="">Cargando jugadores...</option>
-            </select>
-            <!-- Sección para registrar nuevo jugador -->
-            <div id="register-section" class="card">
-                <h3>¿Nuevo jugador?</h3>
-                <input type="text" id="new-name" placeholder="Tu nombre">
-                <button onclick="crearJugador()" class="btn-register">Registrarse</button>
-            </div>
-            <button onclick="seleccionarJugador()">Entrar</button>
-        </div>
 
-        <div id="dashboard" class="card hidden">
-            <h2 id="welcome-user">Hola</h2>
-           <div class="balance-box">
-                <p>Tu Saldo Actual:</p>
-                <h3 id="user-balance">$0</h3>
-            </div>
-
-            <!-- NUEVO: Botón de COBRAR GO -->
-            <button class="btn-go" onclick="cobrarGo()">🚀 Cobrar $200 por pasar por GO</button>
-
-            <div class="transfer-section">
-                <h3>Realizar Pago / Transferencia</h3>
-...
-                <label>Pagar a:</label>
-                <select id="target-select">
-                    </select>
-                <label>Monto ($):</label>
-                <input type="number" id="amount-input" placeholder="Ej. 500">
-                <label>Concepto:</label>
-                <input type="text" id="concept-input" placeholder="Ej. Racha de alquiler">
-                <button class="btn-pay" onclick="realizarPago()">Enviar Dinero</button>
-            </div>
-            
-            <button class="btn-refresh" onclick="cargarDatos()">Actualizar Datos</button>
-        </div>
+<!-- REGISTRO -->
+<div id="vReg" class="vista activa">
+  <h1 class="logo">BANCO MONOPOLY</h1>
+  <div class="card">
+    <h2>REGISTRATE</h2>
+    <div class="cuerpo">
+      <label for="nombre">Nombre</label>
+      <input id="nombre" autocomplete="off">
+      <button id="btnIngresar">Ingresar</button>
     </div>
+  </div>
+</div>
 
-    <script src="app.js"></script>
+<!-- PANEL -->
+<div id="vPanel" class="vista">
+  <header><h2>JUGADOR</h2><button id="btnSalir">Salir</button></header>
+  <div class="panel">
+    <h1 id="pNombre"></h1>
+    <div class="saldo"><small>Saldo actual</small><div id="pSaldo">$ 0</div></div>
+    <button class="btn-block rojo" id="btnBanco">Administrar banco</button>
+    <label>Pagar a</label>
+    <select id="selPagar"><option value="">Seleccione</option></select>
+    <label>Monto</label>
+    <input id="monto" type="number" min="1" inputmode="numeric">
+    <button class="btn-block verde" id="btnPagar">Pagar</button>
+    <button class="btn-block naranja" id="btnMov">Mis movimientos</button>
+    <button class="btn-block azul" id="btnAct">Actualizar</button>
+  </div>
+</div>
+
+<!-- PAGO EXITOSO -->
+<div id="vOk" class="vista">
+  <div class="okcard">
+    <div class="okcuerpo">
+      <svg viewBox="0 0 100 100" class="okicon"><circle cx="50" cy="50" r="50" fill="#1b672d"/><path d="M26 52l16 16 32-34" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div class="oktit">PAGO EXITOSO A</div>
+      <div class="oknom" id="okNombre"></div>
+      <div class="okmonto" id="okMonto"></div>
+    </div>
+    <div class="okpie"><button class="verde" id="btnContinuar">Continuar</button></div>
+  </div>
+</div>
+
+<!-- MODAL MOVIMIENTOS -->
+<div id="mMov" class="modal"><div class="caja">
+  <h3 id="tituloMov">Mis movimientos</h3><div id="listaMov"></div>
+  <button class="btn-block azul" onclick="cerrar('mMov')">Cerrar</button>
+</div></div>
+
+<!-- VISTA BANCO -->
+<div id="vBanco" class="vista">
+  <header><h2>BANCO</h2></header>
+  <div class="bcuerpo">
+    <label>DESEMBOLSAR A</label>
+    <select id="bJug"><option value="">Seleccione</option></select>
+    <label>MONTO</label>
+    <input id="bMonto" type="number" min="1" inputmode="numeric">
+    <button class="verde" id="bDesembolsar">Desembolsar</button>
+    <button class="naranja" id="bMov">Movimientos</button>
+  </div>
+  <div class="bpie"><button class="azul" id="bVolver">Volver al juego</button></div>
+</div>
+
+<!-- DESEMBOLSO EXITOSO -->
+<div id="vOkBanco" class="vista">
+  <div class="okcard">
+    <div class="okcuerpo">
+      <svg viewBox="0 0 100 100" class="okicon"><circle cx="50" cy="50" r="50" fill="#ad1f18"/>
+        <g fill="none" stroke="#fff" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round">
+          <path d="M20 40L50 21l30 19z"/><path d="M24 43h52M26 73h48M22 79h56"/>
+          <path d="M30 46v24M70 46v24M42 46v24M58 46v24"/>
+        </g>
+        <circle cx="50" cy="40" r="0" fill="#fff"/></svg>
+      <div class="oktit">DESEMBOLSO<br>EXITOSO</div>
+      <div class="oknom" id="okbNombre"></div>
+      <div class="okmonto" id="okbMonto"></div>
+    </div>
+    <div class="okpie"><button class="rojo" id="btnContinuarBanco">Continuar</button></div>
+  </div>
+</div>
+
+<div id="loader" class="activa"><div class="spin"></div><div class="lt">Cargando...</div></div>
+<div id="toast"></div>
+
+<script>
+// ⚠️ Pega aquí la URL de tu implementación de Apps Script (termina en /exec)
+const API = "https://script.google.com/macros/s/AKfycbx4wpszK8NvGrBO1sSLaZ0MHysVh7VfUjjsYh4SHmWvF2KEYI7qhC1ILSvKkM4r_6CRTA/exec";
+
+const $ = id => document.getElementById(id);
+const store = {
+  get(){ try{ return JSON.parse(localStorage.getItem("monopoly_user")||"null"); }catch(e){ return null; } },
+  set(v){ try{ localStorage.setItem("monopoly_user", JSON.stringify(v)); }catch(e){} },
+  del(){ try{ store.del(); }catch(e){} }
+};
+let yo = store.get();
+let lista = [];
+
+let cargando = 0;
+function loader(on){
+  cargando = Math.max(0, cargando + (on ? 1 : -1));
+  $("loader").classList.toggle("activa", cargando > 0);
+}
+async function api(params, silent){
+  if(!silent) loader(true);
+  try{
+    const r = await fetch(API + "?" + new URLSearchParams(params));
+    return await r.json();
+  }catch(e){
+    return {ok:false, red:true, error:"Sin conexión con el servidor"};
+  }finally{
+    if(!silent) loader(false);
+  }
+}
+function toast(t){ const e=$("toast"); e.textContent=t; e.style.display="block"; setTimeout(()=>e.style.display="none",2500); }
+function vista(id){ document.querySelectorAll(".vista").forEach(v=>v.classList.remove("activa")); $(id).classList.add("activa"); }
+function cerrar(id){ $(id).classList.remove("activa"); }
+const $$ = n => "$ " + Number(n).toLocaleString("en-US");
+
+const esc = t => String(t).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let timer = null, enVuelo = false;
+function iniciarSync(){
+  clearInterval(timer);
+  timer = setInterval(async () => {
+    if(!yo || enVuelo || document.hidden) return;
+    enVuelo = true;
+    try{ await actualizar(true); }catch(e){}
+    enVuelo = false;
+  }, 3000);
+}
+
+async function actualizar(silent){
+  const [u, j] = await Promise.all([api({action:"usuario", id:yo.id}, silent), api({action:"jugadores"}, silent)]);
+  if(u.red || j.red){ if(!silent) toast("Sin conexión con el servidor"); return; }
+  if(!u.ok){ salir(); return toast(u.error); }
+  yo = u.usuario; store.set(yo);
+  $("pNombre").textContent = yo.nombre.toUpperCase();
+  $("pSaldo").textContent = $$(yo.cuenta);
+  $("btnBanco").style.display = yo.admin ? "" : "none";
+  lista = j.jugadores.filter(x => x.id !== yo.id);
+  const sel = $("selPagar"), sig1 = lista.map(x => x.id + x.nombre).join("|");
+  if(sig1 !== sel.dataset.sig){
+    const prev = sel.value;
+    sel.innerHTML = '<option value="">Seleccione</option><option value="BANCO">BANCO</option>' +
+      lista.map(x => `<option value="${x.id}">${esc(x.nombre)}</option>`).join("");
+    sel.value = prev; sel.dataset.sig = sig1;
+  }
+  const bj = $("bJug"), sig2 = j.jugadores.map(x => x.id + x.nombre).join("|");
+  if(sig2 !== bj.dataset.sig){
+    const prev = bj.value;
+    bj.innerHTML = '<option value="">Seleccione</option>' + j.jugadores.map(x => `<option value="${x.id}">${esc(x.nombre)}</option>`).join("");
+    bj.value = prev; bj.dataset.sig = sig2;
+  }
+}
+
+function entrar(){ $("btnBanco").style.display = yo.admin ? "" : "none"; vista("vPanel"); actualizar(); iniciarSync(); }
+function salir(){ clearInterval(timer); store.del(); yo=null; vista("vReg"); }
+
+$("btnIngresar").onclick = async () => {
+  const nombre = $("nombre").value.trim();
+  if(!nombre) return toast("Escribe tu nombre");
+  const r = await api({action:"registrar", nombre});
+  if(!r.ok) return toast(r.error);
+  yo = r.usuario; store.set(yo); entrar();
+};
+$("nombre").addEventListener("keydown", e => { if(e.key==="Enter") $("btnIngresar").click(); });
+$("btnSalir").onclick = salir;
+$("btnContinuar").onclick = () => vista("vPanel");
+$("btnAct").onclick = async () => { await actualizar(); toast("Actualizado"); };
+
+$("btnPagar").onclick = async () => {
+  const a = $("selPagar").value, monto = Number($("monto").value);
+  if(!a) return toast("Selecciona a quién pagar");
+  if(!(monto>0)) return toast("Monto inválido");
+  const nombre = $("selPagar").selectedOptions[0].textContent;
+  const r = await api({action:"pagar", de:yo.id, a, monto, por:yo.id});
+  if(!r.ok) return toast(r.error);
+  $("monto").value = ""; $("selPagar").value = "";
+  $("okNombre").textContent = nombre; $("okMonto").textContent = $$(monto);
+  vista("vOk"); actualizar();
+};
+
+async function verMov(id, titulo, esBanco){
+  const r = await api({action:"movimientos", id});
+  if(!r.ok) return toast(r.error);
+  $("tituloMov").textContent = titulo;
+  $("listaMov").innerHTML = r.movimientos.length ? r.movimientos.map(m => {
+    const txt = m.tipo === "egreso"
+      ? (esBanco ? "Desembolso a " : "Pagaste a ") + esc(m.recibe)
+      : (esBanco ? "Recibido de " : "Recibiste de ") + esc(m.paga);
+    return `<div class="mov"><span>${txt}</span>
+      <b class="${m.tipo}">${m.tipo==="egreso"?"-":"+"}${$$(m.monto)}</b></div>`;
+  }).join("") : "<p style='text-align:center'>Sin movimientos</p>";
+  $("mMov").classList.add("activa");
+}
+$("btnMov").onclick = () => verMov(yo.id, "Mis movimientos", false);
+
+$("btnBanco").onclick = async () => { await actualizar(); vista("vBanco"); };
+$("bVolver").onclick = () => vista("vPanel");
+$("bMov").onclick = () => verMov("BANCO", "Movimientos del banco", true);
+$("bDesembolsar").onclick = async () => {
+  const sel = $("bJug"), j = sel.value, monto = Number($("bMonto").value);
+  if(!j) return toast("Selecciona un jugador");
+  if(!(monto>0)) return toast("Monto inválido");
+  const nombre = sel.selectedOptions[0].textContent;
+  const r = await api({action:"pagar", de:"BANCO", a:j, monto, por:yo.id});
+  if(!r.ok) return toast(r.error);
+  $("bMonto").value = ""; sel.value = "";
+  $("okbNombre").textContent = nombre; $("okbMonto").textContent = $$(monto);
+  vista("vOkBanco"); actualizar();
+};
+$("btnContinuarBanco").onclick = () => vista("vBanco");
+
+window.addEventListener("error", e => toast("Error: " + e.message));
+if(yo) entrar(); else { vista("vReg"); $("loader").classList.remove("activa"); }
+</script>
 </body>
 </html>
